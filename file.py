@@ -27,7 +27,7 @@ class File:
             # Libera o acesso ao arquivo.
             self.fileSync.release()
 
-    # Liber
+    # Função para liberar o acesso ao arquivo por parte dos leitores
     def releaseReadLock(self):
         global readersCount
         
@@ -42,21 +42,25 @@ class File:
         # Libera o acesso a variável readersCount
         self.mutex.release()
 
+    # Função para bloquear o acesso ao arquivo por parte dos escritores
     def acquireWriteLock(self):
         # Tenta bloquear o acesso dos leitores ao arquivo
         self.fileSync.acquire()
         
-        # Tenta obter acesso ao arquivo para realizar a escrita
+        # Tenta obter acesso ao arquivo para realizar a escritores
         self.file.acquire()
 
+    # Função para liberar o acesso ao arquivo por parte dos escritores
     def releaseWriteLock(self):
         # Libera o acesso ao arquivo
         self.file.release()
 
+    # Função para bloquear o acesso ao arquivo para realizar a sincronização
     def acquireSyncLock(self):
         # Tenta obter acesso ao arquivo para realizar a sincronização
         self.file.acquire()
-        
+
+    # Função para liberar o acesso ao arquivo após a sincronização
     def releaseSyncLock(self):
         # Libera o acesso ao arquivo
         self.file.release()
