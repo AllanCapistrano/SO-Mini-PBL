@@ -10,23 +10,22 @@ class File:
     # Função para bloquear o acesso ao arquivo por parte dos leitores
     def acquireReadLock(self):
         # Tenta obter permissão para a leitura do arquivo
-        self.fileSync.acquire()
-        
-        global readersCount
-        
-        # Tenta obter acesso a variável readersCount
-        self.mutex.acquire()
-        self.readersCount += 1
+        if(self.fileSync.acquire()):
+            global readersCount
+            
+            # Tenta obter acesso a variável readersCount
+            self.mutex.acquire()
+            self.readersCount += 1
 
-        # Somente se for o primeiro leitor bloqueia o acesso ao arquivo. 
-        if(self.readersCount == 1):
-            self.file.acquire()
+            # Somente se for o primeiro leitor bloqueia o acesso ao arquivo. 
+            if(self.readersCount == 1):
+                self.file.acquire()
 
-        # Libera o acesso a variável readersCount
-        self.mutex.release()
+            # Libera o acesso a variável readersCount
+            self.mutex.release()
 
-        # Libera o acesso ao arquivo.
-        self.fileSync.release()
+            # Libera o acesso ao arquivo.
+            self.fileSync.release()
 
     # Liber
     def releaseReadLock(self):
