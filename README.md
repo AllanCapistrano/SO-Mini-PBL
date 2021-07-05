@@ -7,3 +7,16 @@ Para a sincronização foi utilizada a solução do problema dos leitores e escr
 
 **🔗 Tecnologias utilizadas:**
 - [Python](https://www.python.org/)
+
+## 🖥️ Como utilizar ##
+1. Caso ainda não tenha instalado, faça o download do [Python](https://www.python.org/);
+2. Faça o download deste repositório, ou clone-o com o comando:
+```powershell
+git clone https://github.com/AllanCapistrano/micro-pbl-so.git
+```
+3. Abra um terminal¹ no diretório do projeto e execute o seguinte comando:
+```powershell
+python main.py
+```
+
+###### ¹Obs: É recomendado a execução através do terminal do [Visual Studio Code](https://code.visualstudio.com/Download) para a visualização da atualização dos arquivo em tempo real além dos *prints* (Exemplo: [Clique aqui](https://i.imgur.com/FYRMa03.png)). ######
