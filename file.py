@@ -209,17 +209,18 @@ class File:
         # Tenta obter acesso ao arquivo para realizar a escritores
         self.fileSemaphore.acquire()
 
+    # Função para liberar o acesso ao arquivo por parte dos escritores
     def releaseWriteLock(self):
         # Libera o acesso ao arquivo
         self.fileSemaphore.release()
 
-    # Função para liberar o acesso ao arquivo por parte dos escritores
+    # Função para bloquear o acesso ao arquivo para realizar a sincronização
     def acquireSyncLock(self):
         # Tenta obter acesso ao arquivo para realizar a sincronização
         self.fileSemaphore.acquire()
         
         
-    # Função para bloquear o acesso ao arquivo para realizar a sincronização
+    # Função para liberar o acesso ao arquivo por parte dos escritores
     def releaseSyncLock(self):
         # Libera o acesso ao arquivo
         self.fileSemaphore.release()
