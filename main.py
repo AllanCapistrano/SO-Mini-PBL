@@ -4,73 +4,74 @@ from file import File
 
 from string import ascii_lowercase
 from random import choices
-# fução que gera uma string de caracteris aleatorios com o tamnho passado
-# @param tamanho, int, indica o tamnho da string que sera gerada
-def get_random_string(tamanho:int):
-    return ''.join(choices(ascii_lowercase, k=tamanho))
 
-qtdArq = 3# indicamos quantos arquivos queremos
+# Fução que gera uma palavra com caracteres aleatórios.
+# @param length - int | Tamanho da palavra a ser gerada.
+# @return string.
+def get_random_string(length:int):
+    return ''.join(choices(ascii_lowercase, k = length))
 
-file = File(qtdArq) # cria variavel que faz o controle
+numFiles = 3 # Quantidade de arquivos.
 
-# função da thread do escritor
-def writer(e):
+file = File(numFiles) # Variável de controle.
+
+# Processo escritor.
+# @param e - int | Identificador.
+def writer(e:int):
     while True:
+        time.sleep(random.randint(1, 5))
+        file.acquireWriteLock() # Obtém acesso ao arquivo.
+        
+        print(f"\nEscritor {e} pensando nos dados...\n",end='')
+        time.sleep(random.randint(1, 5))
+        
+        content_to_write = get_random_string(random.randint(1, 5))# Gera o conteúdo a escrito.
+        file.write_line(content_to_write) # Realiza a escrita no arquivo.
+        
+        time.sleep(random.randint(1, 5))
+        file.releaseWriteLock() # Libera o acesso ao arquivo.
+        
+        print(f"Escritor {e} - parou de escrever.\n")
 
-        time.sleep(random.randint(1, 5))
-        file.acquireWriteLock()#adquire escrita
-        
-        print(f"Escritor {e} pensando nos dados...",end='')
-        time.sleep(random.randint(1, 5))
-        content_to_write = get_random_string(random.randint(1, 5))#gera conteudo que sera escrito
-        print(f' Escrevendo "{content_to_write}"')
-        
-        print(f"Escritor {e} - escrevendo...")
-        file.write_line(content_to_write) #faz a escrita
-        time.sleep(random.randint(1, 5))
-        file.releaseWriteLock() # solta a escrita
-        
-        print(f"Escritor {e} - parou de escrever.")
-
-#função da thread de leitura
-def reader(l):
+# Processo escritor.
+# @param l - int | Identificador.
+def reader(l:int):
     while True:
         time.sleep(random.randint(1, 10))
-        file.acquireReadLock()# adquire leitura
+        file.acquireReadLock() # Obtém acesso ao arquivo.
         
         print(f"Leitor {l} - lendo...")
         time.sleep(random.randint(1, 5))
-        file.read() # realiza leitura
-        file.releaseReadLock() # solta leitura
         
-        print(f"Leitor {l} - parou de ler.")
+        file.read() # Realiza a leitura do arquivo.
+        file.releaseReadLock() # Libera o acesso ao arquivo.
+        
+        print(f"Leitor {l} - parou de ler.\n")
 
-#função da thread de escrita
-def syncronizer(s, qtdArq):
-    qtdArq = qtdArq
+# Processo sincronizador.
+# @param s - int | Identificador.
+# @param numFiles - int | Número de arquivos.
+def syncronizer(s:int, numFiles:int):
+    numFiles = numFiles
+    
     while True:
         time.sleep(random.randint(1, 3))
-        file.acquireSyncLock() #adquire arquivo
+        file.acquireSyncLock() # Obtém acesso ao arquivo.
 
-        print(f"Sincronizador {s} iniciando sincronização...")
+        print(f"\nSincronizador {s} iniciando sincronização...")
         time.sleep(random.randint(1, 3))
 
-        file.sync() # realiza sincronia
-        # while(qtdArq > 0):
-        #     print("Sincronizando arquivo {}...".format(qtdArq))
-        #     qtdArq -= 1
-        #     # time.sleep(2)
+        file.sync() # Realiza a sincronização dos arquivos.
+        file.releaseSyncLock() # Libera o acesso ao arquivo.
 
-        file.releaseSyncLock()# libera arquivo
-
-        print(f"Sincronizador {s} terminou a sincronização...")
+        print(f"Sincronizador {s} terminou a sincronização.\n")
 
 # Cria os processos que irão realizar a escrita no arquivo
 for i in range(2):
     _thread.start_new_thread(writer, tuple([i]))
 
 # Cria o processo que irá sincronizar os arquivos
-_thread.start_new_thread(syncronizer, tuple([0,qtdArq]))
+_thread.start_new_thread(syncronizer, tuple([0,numFiles]))
 
 # Cria os processos que irão realizar a leitura do arquivo
 for i in range(3):
