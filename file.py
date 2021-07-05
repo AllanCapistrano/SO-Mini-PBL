@@ -17,6 +17,9 @@ class File:
     # @param qtdArq, type:int, indica a quantidade de arquivos que serão usados
     # @param file_path, vetor contendo o caminho dos arquivos que serao usados, caso o vetor nao cotenha caminho de todos os arquivos os que faltarem serao criddos no diretorio /files/. Tem um valor default de None ( assim caso nao seja passado vira com esse valor )
     def __init__(self,qtdArq:int,file_path=None):
+        import os
+        if(not os.path.isdir(os.getcwd()+"/files/")):
+            os.makedirs(os.getcwd()+"/files/")
         self.qtdArq = qtdArq #salvamos a quantidade de arquivos
         if(file_path != None): # caso file_path senha sido passado ele nao tera o valor default de None
             self.file_path = file_path # salvamos o que foi passado
