@@ -11,7 +11,7 @@ class File:
     available_vet = [] # vetor de booleanos que indicam se o arquivo pode ser usado ou nao
     can_be_read = True # booleano para indica se os arquivos podem ser lidos
 
-    fileSyncSemaphore = Semaphore(1) # Semáforo para sincronização do arquivo
+    readersSemaphore = Semaphore(1) # Semáforo para sincronização do arquivo
 
     # função de construção do objeto
     # @param qtdArq, type:int, indica a quantidade de arquivos que serão usados
@@ -22,11 +22,6 @@ class File:
             self.file_path = file_path # salvamos o que foi passado
             #conferimos se em file_path tem todos os arquivos que serao usados ( se len(file_path) < qtrArq )
             conf = [False for _ in range(self.qtdArq)]
-            print()
-            print()
-            print(conf)
-            print()
-            print()
             for n,_ in enumerate(self.file_path):
                 try:
                     conf[n]=True
@@ -100,36 +95,36 @@ class File:
     #Função que sincroniza o conteudo dos arquivos    
     def sync(self):
         print(f'Attempting to syncing content of files')
-        self.read_write_semaphore.acquire()
-        updated_files = []
-        to_be_updated_files = []
-        for n,a in enumerate(self.available_vet):
-            if(a):
+        self.read_write_semaphore.acquire()#bloqueando escrita e elitura
+        updated_files = [] #lista de arquivos atualizados
+        to_be_updated_files = []#lista de arquivos nao atualizados
+        for n,a in enumerate(self.available_vet):# para cada arquivo do sistena
+            if(a):# se ele estiver atualziado adicionamo na lista de atualziados
                updated_files.append(self.file_path[n])
-            else:
+            else:# se nao adicionamos na de nao atualziados
                 to_be_updated_files.append(n)
         print(f"File with content updated: ", end='')
         for f in updated_files:
             print(f,end=", ")
         print()
-        if(len(updated_files) <1):
+        if(len(updated_files) <1):# se a lista de arquivos atualizados for menor que 1 geramos um erro
             raise Exception("There was a problem - no file is considered as contain the most recent version")
-        conteudo = None
-        with open(updated_files[0],'r') as file:
+        conteudo = None# conteudo para ser atualizado nos arquivos
+        with open(updated_files[0],'r') as file: # sera o conteudo do primeiro arquivo da lista de arquivos atualizados
             conteudo = file.readlines()
             file.close()
-        if(conteudo == None):
+        if(conteudo == None):# se o conteudo estive None houve um problema na leitura do conteudo entao geramos um erro
             raise Exception(f"Not able to open {updated_files[0]}")
         # print("Linhas do arquivo mais atualizado:")
         # print(conteudo)
         print("Updating content on: ",end='')
-        for a in to_be_updated_files:
+        for a in to_be_updated_files:# para cada arquivo nao atualizado
             print(self.file_path[a],end=', ')
             old_content = None
-            with open(self.file_path[a],'r') as file_to_update:
+            with open(self.file_path[a],'r') as file_to_update:#salvamos o conteudo antigo
                 old_content = file_to_update.readlines()
                 file_to_update.close()
-            with open(self.file_path[a],'a') as file_to_update:
+            with open(self.file_path[a],'a') as file_to_update:# e adicionamos o que falta, para essa comparação é legado em conta apenas o numero de linhas do arquivo ( sendo considerado que o conteudo antigo ja foi sincronizado no passo e por tanto as linhas sao iguais )
                 # print("linhas lidas do arquivo:",self.file_path[a])
                 # print(old_content)
                 # print("linhas que serão adicionadas:", end='')
@@ -137,23 +132,15 @@ class File:
                     #print(l,end=", ")
                     file_to_update.write(l)
                 #print()
-            self.available_vet[a] = True
-            print()
-        self.can_be_read = True
+            self.available_vet[a] = True# entao marcamos esse arquivo como atualizado
+        print()
+        self.can_be_read = True # marcamos que os arquivos ja podem ser lidos
         print("Content of files: ",end="")
         for a in range(self.qtdArq):
             print(f'"{self.file_path[a]}" is {"the latest" if self.available_vet[a] else "not the latest"}',end=', ')
         print()
-        self.read_write_semaphore.release()
-        return
+        self.read_write_semaphore.release()# liberamos escrita e leitura
 
-    def delete_files(self):
-        import os
-        for a in range(self.qtdArq):
-            if os.path.exists(self.file_path[a]):
-                os.remove(self.file_path[a])
-            else:
-                print("The file does not exist")
     #metodo que printa o conteudo do objeto ( quando chamamos print() e passamos um objeto sera chamado a função __str__ do obj, entoa essa função diz como o objeto deve ser printado, retornando uma string que sera printada)
     def __str__(self):
         return f"Num of files: {self.qtdArq}\n"+ f'Files: {self.file_path}\n'+ f"available vet: {self.available_vet}"
@@ -161,7 +148,7 @@ class File:
     # Função para bloquear o acesso ao arquivo por parte dos leitores
     def acquireReadLock(self):
         # Tenta obter permissão para a leitura do arquivo
-        if(self.fileSyncSemaphore.acquire()):
+        if(self.readersSemaphore.acquire()):
             # Tenta obter acesso a variável readersCount
             self.readersCountSemaphore.acquire()
             self.readersCount += 1
@@ -174,7 +161,7 @@ class File:
             self.readersCountSemaphore.release()
 
             # Libera o acesso ao arquivo.
-            self.fileSyncSemaphore.release()
+            self.readersSemaphore.release()
 
     # Função para liberar o acesso ao arquivo por parte dos leitores
     def releaseReadLock(self):
@@ -192,7 +179,7 @@ class File:
     # Função para bloquear o acesso ao arquivo por parte dos escritores
     def acquireWriteLock(self):
         # Tenta bloquear o acesso dos leitores ao arquivo
-        self.fileSyncSemaphore.acquire()
+        self.readersSemaphore.acquire()
         
         # Tenta obter acesso ao arquivo para realizar a escritores
         self.fileSemaphore.acquire()
@@ -213,4 +200,4 @@ class File:
         self.fileSemaphore.release()
 
         # Libera o acesso dos leitores ao arquivo
-        self.fileSyncSemaphore.release()
+        self.readersSemaphore.release()

@@ -21,11 +21,6 @@ class File:
             self.file_path = file_path # salvamos o que foi passado
             #conferimos se em file_path tem todos os arquivos que serao usados ( se len(file_path) < qtrArq )
             conf = [False for _ in range(self.qtdArq)]
-            print()
-            print()
-            print(conf)
-            print()
-            print()
             for n,_ in enumerate(self.file_path):
                 try:
                     conf[n]=True
@@ -95,36 +90,36 @@ class File:
     #Função que sincroniza o conteudo dos arquivos    
     def sync(self):
         print(f'Attempting to syncing content of files')
-        self.read_write_mutex.acquire()
-        updated_files = []
-        to_be_updated_files = []
-        for n,a in enumerate(self.available_vet):
-            if(a):
+        self.read_write_mutex.acquire() #trava leitura e escrita
+        updated_files = [] #lista de arquivos atualizados
+        to_be_updated_files = [] #lista de arquivos nao atualziados
+        for n,a in enumerate(self.available_vet): #para cada arquivo do sistema
+            if(a): # se estiver atualziado adicionamos na lista de atualziados
                updated_files.append(self.file_path[n])
-            else:
+            else:# se nao atualizamos na lista de nao atualizados
                 to_be_updated_files.append(n)
         print(f"File with content updated: ", end='')
-        for f in updated_files:
+        for f in updated_files:# 
             print(f,end=", ")
         print()
-        if(len(updated_files) <1):
+        if(len(updated_files) <1):# se nao houver arquivo da lista de atualizados gera um erro
             raise Exception("There was a problem - no file is considered as contain the most recent version")
-        conteudo = None
-        with open(updated_files[0],'r') as file:
+        conteudo = None#cria vatiavel com conteudo que sera atualizado nos outros arquivos como None para ser sobreescria
+        with open(updated_files[0],'r') as file:# salva o conteudo do primeiro arquivo atualizado
             conteudo = file.readlines()
             file.close()
-        if(conteudo == None):
+        if(conteudo == None):# se ainda estiver com None algum erro aconteceu na leitura do arquivo entao gera um erro
             raise Exception(f"Not able to open {updated_files[0]}")
         # print("Linhas do arquivo mais atualizado:")
         # print(conteudo)
         print("Updating content on: ",end='')
-        for a in to_be_updated_files:
+        for a in to_be_updated_files:# para cara arquivo que sera atualizado
             print(self.file_path[a],end=', ')
             old_content = None
-            with open(self.file_path[a],'r') as file_to_update:
+            with open(self.file_path[a],'r') as file_to_update:# salva o antigo conteudo do arquivo para comparação
                 old_content = file_to_update.readlines()
                 file_to_update.close()
-            with open(self.file_path[a],'a') as file_to_update:
+            with open(self.file_path[a],'a') as file_to_update:#e so fazemos a escrita do conteudo que falta. essa comparação é feita pela contagem de linhas
                 # print("linhas lidas do arquivo:",self.file_path[a])
                 # print(old_content)
                 # print("linhas que serão adicionadas:", end='')
@@ -132,8 +127,8 @@ class File:
                     #print(l,end=", ")
                     file_to_update.write(l)
                 #print()
-            self.available_vet[a] = True
-            print()
+            self.available_vet[a] = True # marca esse arquivo como atualizado
+        print()
         print("Content of files: ",end="")
         for a in range(self.qtdArq):
             print(f'"{self.file_path[a]}" is {"the latest" if self.available_vet[a] else "not the latest"}',end=', ')
@@ -141,13 +136,6 @@ class File:
         self.read_write_mutex.release()
         return
 
-    def delete_files(self):
-        import os
-        for a in range(self.qtdArq):
-            if os.path.exists(self.file_path[a]):
-                os.remove(self.file_path[a])
-            else:
-                print("The file does not exist")
     #metodo que printa o conteudo do objeto ( quando chamamos print() e passamos um objeto sera chamado a função __str__ do obj, entoa essa função diz como o objeto deve ser printado, retornando uma string que sera printada)
     def __str__(self):
         return f"Num of files: {self.qtdArq}\n"+ f'Files: {self.file_path}\n'+ f"available vet: {self.available_vet}"
