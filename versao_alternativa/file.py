@@ -32,12 +32,36 @@ class File:
                     self.file_path.append(f'files/file_v2_{n}.txt')
         else: # caso contrario criamos os arquivos no diretorio files/
             self.file_path = [f'files/file_v2_{n}.txt' for n in range(self.qtdArq)]
-        for a in range(self.qtdArq):
-            try:
-                open(self.file_path[a],'a')
-            except:
-                open(self.file_path[a],'w')
+        # agora verificamos se os arquivos estao sincronizados
+        num_lines = [] # fazendo a verificação do numero de linhas q eles tem
+        for a in range(self.qtdArq): #para cada arquivo
+            try: # tentamos abri ele como leitura
+                f = open(self.file_path[a],'r')
+                num_lines.append(len(f.readlines())) # e salvar o numero de linhas q ele tem
+            except:# caso haja erro é porque ele nao existe
+                open(self.file_path[a],'w') # entao criamos ele
+                num_lines.append(0)# e salvamos que tem 0 linhas
             self.available_vet.append(True)
+        with_more_lines = 0
+        poss_file_with_more_lines=None
+        with_less_lines=0
+        for a in range(self.qtdArq): # para cada arquivo
+            if(num_lines[a]>with_more_lines):# se ele tiver a maior quantidade de linhas salvamos a sua posição
+                with_more_lines = num_lines[a]
+                poss_file_with_more_lines = a
+            if(num_lines[a]<with_less_lines):
+                with_less_lines = num_lines[a]
+        if( with_more_lines != with_less_lines): #caso o arquivo com mais linhas e com menos linhas nao tenham a mesma quantidade quer dizer que existe um arquivo com mais informação que os outros, entao essa informação sera repassada
+            print("synchronizing files")
+            content = None
+            with open(self.file_path[poss_file_with_more_lines],'r') as file:# para isso salvamos o conteudo do com mais conteudo
+                content = file.readlines()
+                file.close()
+            for a in range(self.qtdArq):# e para cada arquivo do sistema
+                with open(self.file_path[a],'a') as file: # abrimos como apend
+                    for l in content[num_lines[a]:]: # e escrevemos as linhas que ele nao tem
+                        file.write(l)
+                    file.close()
 #        for a in range(self.qtdArq):
 #            print(a,"  ",self.file_path[a],'   ',self.available_vet[a])
             
@@ -172,9 +196,6 @@ class File:
         self.readersCountMutex.release()
 
     def acquireWriteLock(self):
-        # Tenta bloquear o acesso dos leitores ao arquivo
-        self.fileSyncMutex.acquire()
-        
         # Tenta obter acesso ao arquivo para realizar a escrita
         self.fileMutex.acquire()
 
@@ -190,5 +211,3 @@ class File:
         # Libera o acesso ao arquivo
         self.fileMutex.release()
 
-        # Libera o acesso dos leitores ao arquivo
-        self.fileSyncMutex.release()

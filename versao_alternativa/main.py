@@ -13,8 +13,8 @@ file = File(qtdArq)
 
 def writer(e):
     while True:
-
-        time.sleep(random.randint(1, 5))
+#        time.sleep(random.randint(1, 5))
+        time.sleep(random.randint(10, 11))
         file.acquireWriteLock()
         
         print(f"Escritor {e} pensando nos dados...",end='')
@@ -31,7 +31,8 @@ def writer(e):
 
 def reader(l):
     while True:
-        time.sleep(random.randint(1, 10))
+        #time.sleep(random.randint(1, 10))
+        time.sleep(random.randint(1, 5))
         file.acquireReadLock()
         
         print(f"Leitor {l} - lendo...")
