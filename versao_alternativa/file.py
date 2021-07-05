@@ -9,7 +9,6 @@ class File:
 
     read_write_mutex = Semaphore(1) # Semáfaro para acesso do vetor de arquivos disponiveis para ultilização e variavel que indica se leitura esta disponivel
     available_vet = [] # vetor de booleanos que indicam se o arquivo pode ser usado ou nao
-    can_be_read = True # booleano para indica se os arquivos podem ser lidos
 
     fileSyncMutex = Semaphore(1) # Semáforo para sincronização do arquivo
 
@@ -35,9 +34,9 @@ class File:
             # Caso nao tenhamos todos os que faltam sao criados no diretorio /files/
             for n,alredy_exist in enumerate(conf):
                 if(not alredy_exist):
-                    self.file_path.append(f'files/file{n}.txt')
+                    self.file_path.append(f'files/file_v2_{n}.txt')
         else: # caso contrario criamos os arquivos no diretorio files/
-            self.file_path = [f'files/file{n}.txt' for n in range(self.qtdArq)]
+            self.file_path = [f'files/file_v2_{n}.txt' for n in range(self.qtdArq)]
         for a in range(self.qtdArq):
             try:
                 open(self.file_path[a],'a')
@@ -50,7 +49,6 @@ class File:
     # Esta função recebe o que vai ser escrito como parametro e é responsavel por repassar para um arquivo
     def write_line(self,write_this:str):
         self.read_write_mutex.acquire() # travando edição de variaveis
-        self.can_be_read = False # marcando arquivos como nao podendo mais ser lidos
         chosen_file = self.__chose_file__() # chama função que procura um arquivo para ser escrito, nota: nessa função nao preisamos bloquear o acesso pois nela nao sera feita escrita so leitura e nesta ja estamos bloqueando, entao garantimos que nenhum outro ira modifica as variaveis 
         if(chosen_file["found"]): # se achar um arquivo
             print(f"writing '{write_this}' on {chosen_file['file']}")
@@ -65,18 +63,15 @@ class File:
     def read(self):
         self.read_write_mutex.acquire()#travamos a edição das variaveis
         content = None #marcamos o conteudo da leitura como inexistente
-        if(self.can_be_read): # verificamos se pode ser feito a lietura
-            chosen_file = self.__chose_file__() #se for possivel pedimos um arquivo
-            if(chosen_file['found']): # se houver um arquivo
-                print(f'Reading content from "{chosen_file["file"]}"')
-                with open(chosen_file['file'],'r') as file: # abrimos ele para leitura
-                    content = file.readlines()# salvamos o conteudo dele
-                    file.close() # e fechamos o arquivo
-                print(f"content:")
-                print(content)
-                print(f'end of content')
-        else:
-            print("unable to read from files, they are unsynced")
+        chosen_file = self.__chose_file__() #se for possivel pedimos um arquivo
+        if(chosen_file['found']): # se houver um arquivo
+            print(f'Reading content from "{chosen_file["file"]}"')
+            with open(chosen_file['file'],'r') as file: # abrimos ele para leitura
+                content = file.readlines()# salvamos o conteudo dele
+                file.close() # e fechamos o arquivo
+            print(f"content:")
+            print(content)
+            print(f'end of content')
         self.read_write_mutex.release()# por fim liberamos as variaveis
         return content # e retornamos os conteudo
     
@@ -139,7 +134,6 @@ class File:
                 #print()
             self.available_vet[a] = True
             print()
-        self.can_be_read = True
         print("Content of files: ",end="")
         for a in range(self.qtdArq):
             print(f'"{self.file_path[a]}" is {"the latest" if self.available_vet[a] else "not the latest"}',end=', ')
