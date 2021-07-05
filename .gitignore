@@ -1,4 +1,4 @@
 __pycache__/
 file_test.py
-files/*.txt
+/files/
 /versao_alternativa/
