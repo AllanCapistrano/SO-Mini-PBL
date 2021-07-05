@@ -17,29 +17,29 @@ def writer(e):
         time.sleep(random.randint(1, 5))
         file.acquireWriteLock()
         
-        print("Escritor {e} pensando nos dados...",end='')
+        print(f"Escritor {e} pensando nos dados...",end='')
         time.sleep(random.randint(1, 5))
         content_to_write = get_random_string(random.randint(1, 5))
-        print(' Escrevendo "{content_to_write}"')
+        print(f' Escrevendo "{content_to_write}"')
         
-        print("Escritor {e} - escrevendo...")
+        print(f"Escritor {e} - escrevendo...")
         file.write_line(content_to_write)
         time.sleep(random.randint(1, 5))
         file.releaseWriteLock()
         
-        print("Escritor {e} - parou de escrever.")
+        print(f"Escritor {e} - parou de escrever.")
 
 def reader(l):
     while True:
         time.sleep(random.randint(1, 10))
         file.acquireReadLock()
         
-        print("Leitor {l} - lendo...")
+        print(f"Leitor {l} - lendo...")
         time.sleep(random.randint(1, 5))
         file.read()
         file.releaseReadLock()
         
-        print("Leitor {l} - parou de ler.")
+        print(f"Leitor {l} - parou de ler.")
 
 def syncronizer(s, qtdArq):
     qtdArq = qtdArq
@@ -47,7 +47,7 @@ def syncronizer(s, qtdArq):
         time.sleep(random.randint(1, 3))
         file.acquireSyncLock()
 
-        print("Sincronizador {s} iniciando sincronização...")
+        print(f"Sincronizador {s} iniciando sincronização...")
         time.sleep(random.randint(1, 3))
 
         file.sync()
@@ -58,7 +58,7 @@ def syncronizer(s, qtdArq):
 
         file.releaseSyncLock()
 
-        print("Sincronizador {s} terminou a sincronização...")
+        print(f"Sincronizador {s} terminou a sincronização...")
 
 # Cria os processos que irão realizar a escrita no arquivo
 for i in range(2):

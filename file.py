@@ -4,14 +4,14 @@ import random
 class File:
 
     readersCount = 0 # Quantidade de leitores no momento
-    readersCountMutex = Semaphore(1) # Semáforo mutex para alteração da quantidade de leitores
-    fileMutex = Semaphore(1) # Semáforo para acesso ao arquivo
+    readersCountSemaphore = Semaphore(1) # Semáforo mutex para alteração da quantidade de leitores
+    fileSemaphore = Semaphore(1) # Semáforo para acesso ao arquivo
 
-    read_write_mutex = Semaphore(1) # Semáfaro para acesso do vetor de arquivos disponiveis para ultilização e variavel que indica se leitura esta disponivel
+    read_write_semaphore = Semaphore(1) # Semáfaro para acesso do vetor de arquivos disponiveis para ultilização e variavel que indica se leitura esta disponivel
     available_vet = [] # vetor de booleanos que indicam se o arquivo pode ser usado ou nao
     can_be_read = True # booleano para indica se os arquivos podem ser lidos
 
-    fileSyncMutex = Semaphore(1) # Semáforo para sincronização do arquivo
+    fileSyncSemaphore = Semaphore(1) # Semáforo para sincronização do arquivo
 
     # função de construção do objeto
     # @param qtdArq, type:int, indica a quantidade de arquivos que serão usados
@@ -49,7 +49,7 @@ class File:
             
     # Esta função recebe o que vai ser escrito como parametro e é responsavel por repassar para um arquivo
     def write_line(self,write_this:str):
-        self.read_write_mutex.acquire() # travando edição de variaveis
+        self.read_write_semaphore.acquire() # travando edição de variaveis
         self.can_be_read = False # marcando arquivos como nao podendo mais ser lidos
         chosen_file = self.__chose_file__() # chama função que procura um arquivo para ser escrito, nota: nessa função nao preisamos bloquear o acesso pois nela nao sera feita escrita so leitura e nesta ja estamos bloqueando, entao garantimos que nenhum outro ira modifica as variaveis 
         if(chosen_file["found"]): # se achar um arquivo
@@ -59,11 +59,11 @@ class File:
                 file.close() # e fechamos o arquivo
             for n in range(self.qtdArq):# para cada arquivo do sistema
                 self.available_vet[n] = self.file_path[n] == chosen_file['file'] # marcamos ele como nao atualizado se nao foi o arquivo que editamos
-        self.read_write_mutex.release() # liberamos as variaveis
+        self.read_write_semaphore.release() # liberamos as variaveis
     
     # Esta função retorna o conteudo de um arquivo ja sincronizado
     def read(self):
-        self.read_write_mutex.acquire()#travamos a edição das variaveis
+        self.read_write_semaphore.acquire()#travamos a edição das variaveis
         content = None #marcamos o conteudo da leitura como inexistente
         if(self.can_be_read): # verificamos se pode ser feito a lietura
             chosen_file = self.__chose_file__() #se for possivel pedimos um arquivo
@@ -77,7 +77,7 @@ class File:
                 print(f'end of content')
         else:
             print("unable to read from files, they are unsynced")
-        self.read_write_mutex.release()# por fim liberamos as variaveis
+        self.read_write_semaphore.release()# por fim liberamos as variaveis
         return content # e retornamos os conteudo
     
     # Esta função retorna um arquivo aleatorio sincronizado
@@ -100,7 +100,7 @@ class File:
     #Função que sincroniza o conteudo dos arquivos    
     def sync(self):
         print(f'Attempting to syncing content of files')
-        self.read_write_mutex.acquire()
+        self.read_write_semaphore.acquire()
         updated_files = []
         to_be_updated_files = []
         for n,a in enumerate(self.available_vet):
@@ -144,7 +144,7 @@ class File:
         for a in range(self.qtdArq):
             print(f'"{self.file_path[a]}" is {"the latest" if self.available_vet[a] else "not the latest"}',end=', ')
         print()
-        self.read_write_mutex.release()
+        self.read_write_semaphore.release()
         return
 
     def delete_files(self):
@@ -161,52 +161,56 @@ class File:
     # Função para bloquear o acesso ao arquivo por parte dos leitores
     def acquireReadLock(self):
         # Tenta obter permissão para a leitura do arquivo
-        if(self.fileSyncMutex.acquire()):
+        if(self.fileSyncSemaphore.acquire()):
             # Tenta obter acesso a variável readersCount
-            self.readersCountMutex.acquire()
+            self.readersCountSemaphore.acquire()
             self.readersCount += 1
 
             # Somente se for o primeiro leitor bloqueia o acesso ao arquivo. 
             if(self.readersCount == 1):
-                self.fileMutex.acquire()
+                self.fileSemaphore.acquire()
 
             # Libera o acesso a variável readersCount
-            self.readersCountMutex.release()
+            self.readersCountSemaphore.release()
 
             # Libera o acesso ao arquivo.
-            self.fileSyncMutex.release()
+            self.fileSyncSemaphore.release()
 
-    # Liber
+    # Função para liberar o acesso ao arquivo por parte dos leitores
     def releaseReadLock(self):
         # Tenta obter acesso a variável readersCount
-        self.readersCountMutex.acquire()
+        self.readersCountSemaphore.acquire()
         self.readersCount -= 1
 
         # Somente se for o último leitor libera o acesso ao arquivo. 
         if(self.readersCount == 0):
-            self.fileMutex.release()
+            self.fileSemaphore.release()
 
         # Libera o acesso a variável readersCount
-        self.readersCountMutex.release()
+        self.readersCountSemaphore.release()
 
+    # Função para bloquear o acesso ao arquivo por parte dos escritores
     def acquireWriteLock(self):
         # Tenta bloquear o acesso dos leitores ao arquivo
-        self.fileSyncMutex.acquire()
+        self.fileSyncSemaphore.acquire()
         
-        # Tenta obter acesso ao arquivo para realizar a escrita
-        self.fileMutex.acquire()
+        # Tenta obter acesso ao arquivo para realizar a escritores
+        self.fileSemaphore.acquire()
 
     def releaseWriteLock(self):
         # Libera o acesso ao arquivo
-        self.fileMutex.release()
+        self.fileSemaphore.release()
 
+    # Função para liberar o acesso ao arquivo por parte dos escritores
     def acquireSyncLock(self):
         # Tenta obter acesso ao arquivo para realizar a sincronização
-        self.fileMutex.acquire()
+        self.fileSemaphore.acquire()
         
+        
+    # Função para bloquear o acesso ao arquivo para realizar a sincronização
     def releaseSyncLock(self):
         # Libera o acesso ao arquivo
-        self.fileMutex.release()
+        self.fileSemaphore.release()
 
         # Libera o acesso dos leitores ao arquivo
-        self.fileSyncMutex.release()
+        self.fileSyncSemaphore.release()
