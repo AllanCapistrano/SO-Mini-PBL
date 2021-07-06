@@ -1,18 +1,16 @@
-# micro-pbl-so
-
 ## 📚 Descrição ##
-Projeto para a avaliação 3 da disciplina TEC408 Sistemas Operacionais (T02). projeto consiste na sincronização de três arquivos, que são escritos por processos que são gerados aleatoriamente. Os três arquivos devem possuir o mesmo conteúdo.
+Projeto para a 3ª avaliação da disciplina TEC408 - Sistemas Operacionais (T02). O projeto consite em três arquivos que devem possuir o mesmo conteúdo, ou seja, estarem sincronizados; processos que são gerados aleatoriamente podem realizar leituras e escritas em qualquer um dos arquivos, sem a possibilidade de escolha; os arquivos devem ser sincronizados por processos que também são gerados aleatoriamente.
 
-Para a sincronização foi utilizada a solução do problema dos leitores e escritores, juntamente com semáforos mutex.
+Para a sincronização foi utilizada a solução do problema dos Leitores e Escritores, juntamente com semáforos mutex.
 
-**🔗 Tecnologias utilizadas:**
+**🔗 Linguagem utilizada:**
 - [Python](https://www.python.org/)
 
 ---
 
 ## 🖥️ Como utilizar ##
 1. Caso ainda não tenha instalado, faça o download do [Python](https://www.python.org/);
-2. Faça o download deste repositório, ou clone-o com o comando:
+2. Faça o download do `.zip` deste repositório, ou clone-o com o comando:
 ```powershell
 git clone https://github.com/AllanCapistrano/micro-pbl-so.git
 ```
