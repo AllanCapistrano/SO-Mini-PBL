@@ -25,5 +25,5 @@ python main.py
 ## 👨‍💻 Grupo ##
 - [Allan Capistrano](https://github.com/AllanCapistrano)
 - [Daniel Fernandes](https://github.com/denielfer)
-- [Felipe Queiroz](https://github.com/Tensseii)
+- [Felipe Silva](https://github.com/Tensseii)
 - [João Erick Barbosa](https://github.com/JoaoErick)
