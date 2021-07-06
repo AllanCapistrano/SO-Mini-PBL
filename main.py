@@ -20,7 +20,7 @@ file = File(numFiles) # Variável de controle.
 def writer(e:int):
     while True:
         time.sleep(random.randint(1, 5))
-        file.acquireWriteLock() # Obtém acesso ao arquivo.
+        file.downWrite() # Obtém acesso ao arquivo.
         
         print(f"\nEscritor {e} pensando nos dados...\n",end='')
         time.sleep(random.randint(1, 5))
@@ -29,7 +29,7 @@ def writer(e:int):
         file.write_line(content_to_write) # Realiza a escrita no arquivo.
         
         time.sleep(random.randint(1, 5))
-        file.releaseWriteLock() # Libera o acesso ao arquivo.
+        file.upWrite() # Libera o acesso ao arquivo.
         
         print(f"Escritor {e} - parou de escrever.\n")
 
@@ -38,13 +38,13 @@ def writer(e:int):
 def reader(l:int):
     while True:
         time.sleep(random.randint(1, 10))
-        file.acquireReadLock() # Obtém acesso ao arquivo.
+        file.downRead() # Obtém acesso ao arquivo.
         
         print(f"Leitor {l} - lendo...")
         time.sleep(random.randint(1, 5))
         
         file.read() # Realiza a leitura do arquivo.
-        file.releaseReadLock() # Libera o acesso ao arquivo.
+        file.upRead() # Libera o acesso ao arquivo.
         
         print(f"Leitor {l} - parou de ler.\n")
 
@@ -56,13 +56,13 @@ def syncronizer(s:int, numFiles:int):
     
     while True:
         time.sleep(random.randint(1, 3))
-        file.acquireSyncLock() # Obtém acesso ao arquivo.
+        file.downSync() # Obtém acesso ao arquivo.
 
         print(f"\nSincronizador {s} iniciando sincronização...")
         time.sleep(random.randint(1, 3))
 
         file.sync() # Realiza a sincronização dos arquivos.
-        file.releaseSyncLock() # Libera o acesso ao arquivo.
+        file.upSync() # Libera o acesso ao arquivo.
 
         print(f"Sincronizador {s} terminou a sincronização.\n")
 

@@ -142,7 +142,7 @@ class File:
                 
                 print(f"\nConteúdo:")
                 print(content)
-                print(f'Final do arquivo.\n')
+                print()
         else:
             print("Não é permitida a leitura do arquivo, é necessário uma sincronização.")
         
@@ -246,7 +246,7 @@ class File:
         return f"Num of files: {self.qtdArq}\n"+ f'Files: {self.file_path}\n'+ f"available vet: {self.available_vet}"
 
     # Função para bloquear o acesso ao arquivo por parte dos leitores
-    def acquireReadLock(self):
+    def downRead(self):
         # Tenta obter permissão para a leitura do arquivo
         if(self.readersSemaphore.acquire()):
             global readersCount
@@ -266,7 +266,7 @@ class File:
             self.readersSemaphore.release()
 
     # Função para liberar o acesso ao arquivo por parte dos leitores
-    def releaseReadLock(self):
+    def upRead(self):
         global readersCount
         
         # Tenta obter acesso a variável readersCount
@@ -281,7 +281,7 @@ class File:
         self.readersCountSemaphore.release()
 
     # Função para bloquear o acesso ao arquivo por parte dos escritores
-    def acquireWriteLock(self):
+    def downWrite(self):
         # Tenta bloquear o acesso dos leitores ao arquivo
         self.readersSemaphore.acquire()
         
@@ -289,18 +289,17 @@ class File:
         self.fileSemaphore.acquire()
 
     # Função para liberar o acesso ao arquivo por parte dos escritores
-    def releaseWriteLock(self):
+    def upWrite(self):
         # Libera o acesso ao arquivo
         self.fileSemaphore.release()
 
     # Função para bloquear o acesso ao arquivo para realizar a sincronização
-    def acquireSyncLock(self):
+    def downSync(self):
         # Tenta obter acesso ao arquivo para realizar a sincronização
         self.fileSemaphore.acquire()
-        
-        
+         
     # Função para liberar o acesso ao arquivo por parte dos escritores
-    def releaseSyncLock(self):
+    def upSync(self):
         # Libera o acesso ao arquivo
         self.fileSemaphore.release()
 
