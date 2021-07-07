@@ -26,7 +26,7 @@ def writer_reader(wr:int):
             time.sleep(random.randint(1, 5))
             file.downWrite() # Obtém acesso ao arquivo.
             
-            print(f"\nEscritor {wr} pensando nos dados...\n",end='')
+            print(f"\nProcesso {wr} pensando nos dados...\n",end='')
             time.sleep(random.randint(1, 5))
             
             content_to_write = get_random_string(random.randint(1, 5))# Gera o conteúdo a escrito.
@@ -35,19 +35,19 @@ def writer_reader(wr:int):
             time.sleep(random.randint(1, 5))
             file.upWrite() # Libera o acesso ao arquivo.
             
-            print(f"Escritor {wr} - parou de escrever.\n")
+            print(f"Processo {wr} - parou de escrever.\n")
     else:
         while True:
             time.sleep(random.randint(1, 10))
             file.downRead() # Obtém acesso ao arquivo.
             
-            print(f"Leitor {wr} - lendo...")
+            print(f"Processo {wr} - lendo...")
             time.sleep(random.randint(1, 5))
             
             file.read() # Realiza a leitura do arquivo.
             file.upRead() # Libera o acesso ao arquivo.
             
-            print(f"Leitor {wr} - parou de ler.\n")
+            print(f"Processo {wr} - parou de ler.\n")
 
 # Processo sincronizador.
 # @param s - int | Identificador do processo.
