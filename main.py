@@ -15,41 +15,42 @@ numFiles = 3 # Quantidade de arquivos.
 
 file = File(numFiles) # Variável de controle.
 
-# Processo escritor.
-# @param e - int | Identificador.
-def writer(e:int):
-    while True:
-        time.sleep(random.randint(1, 5))
-        file.downWrite() # Obtém acesso ao arquivo.
-        
-        print(f"\nEscritor {e} pensando nos dados...\n",end='')
-        time.sleep(random.randint(1, 5))
-        
-        content_to_write = get_random_string(random.randint(1, 5))# Gera o conteúdo a escrito.
-        file.write_line(content_to_write) # Realiza a escrita no arquivo.
-        
-        time.sleep(random.randint(1, 5))
-        file.upWrite() # Libera o acesso ao arquivo.
-        
-        print(f"Escritor {e} - parou de escrever.\n")
-
-# Processo escritor.
-# @param l - int | Identificador.
-def reader(l:int):
-    while True:
-        time.sleep(random.randint(1, 10))
-        file.downRead() # Obtém acesso ao arquivo.
-        
-        print(f"Leitor {l} - lendo...")
-        time.sleep(random.randint(1, 5))
-        
-        file.read() # Realiza a leitura do arquivo.
-        file.upRead() # Libera o acesso ao arquivo.
-        
-        print(f"Leitor {l} - parou de ler.\n")
+# Classe de processos que podem ler ou escrever no arquivo.
+# @ param wr - int | Identificador do processo.
+def writer_reader(wr:int):
+    # Para a escolha da ação que o processo irá tomar (leitura ou escrita).
+    num = random.randint(0, 100)
+    
+    if(num % 2 == 0):
+        while True:
+            time.sleep(random.randint(1, 5))
+            file.downWrite() # Obtém acesso ao arquivo.
+            
+            print(f"\nEscritor {wr} pensando nos dados...\n",end='')
+            time.sleep(random.randint(1, 5))
+            
+            content_to_write = get_random_string(random.randint(1, 5))# Gera o conteúdo a escrito.
+            file.write_line(content_to_write) # Realiza a escrita no arquivo.
+            
+            time.sleep(random.randint(1, 5))
+            file.upWrite() # Libera o acesso ao arquivo.
+            
+            print(f"Escritor {wr} - parou de escrever.\n")
+    else:
+        while True:
+            time.sleep(random.randint(1, 10))
+            file.downRead() # Obtém acesso ao arquivo.
+            
+            print(f"Leitor {wr} - lendo...")
+            time.sleep(random.randint(1, 5))
+            
+            file.read() # Realiza a leitura do arquivo.
+            file.upRead() # Libera o acesso ao arquivo.
+            
+            print(f"Leitor {wr} - parou de ler.\n")
 
 # Processo sincronizador.
-# @param s - int | Identificador.
+# @param s - int | Identificador do processo.
 # @param numFiles - int | Número de arquivos.
 def syncronizer(s:int, numFiles:int):
     numFiles = numFiles
@@ -66,16 +67,15 @@ def syncronizer(s:int, numFiles:int):
 
         print(f"Sincronizador {s} terminou a sincronização.\n")
 
-# Cria os processos que irão realizar a escrita no arquivo
-for i in range(2):
-    _thread.start_new_thread(writer, tuple([i]))
 
-# Cria o processo que irá sincronizar os arquivos
+
+# Cria o processo que irá sincronizar os arquivos.
 _thread.start_new_thread(syncronizer, tuple([0,numFiles]))
 
-# Cria os processos que irão realizar a leitura do arquivo
-for i in range(3):
-    _thread.start_new_thread(reader, tuple([i]))
+
+# Cria os processos que podem ler ou escrever no arquivo.
+for i in range(5):
+    _thread.start_new_thread(writer_reader, tuple([i]))
 
 
 while 1: pass
