@@ -12,25 +12,25 @@ def get_random_string(length:int):
 
 numFiles = 3 # Quantidade de arquivos.
 
-#file = File(numFiles,file_path=['files/folder1/file.txt','files/folder2/file.txt']) # Variável de controle.
-file = File(numFiles)
+file = File(numFiles) # Variável de controle.
+
 # Classe de processos que podem ler ou escrever no arquivo.
 # @ param wr - int | Identificador do processo.
 def writer_reader(wr:int):
-    #dorme por entre 1 a 5s
     time.sleep(random.randint(1, 5))
+
     while True:
-        # é feito uma escolha aleatoria se sera feito uma escrita ou leitura
-        if(random.randint(0, 1)):# se for Escrita
+        # Escolha aleatória se será feita uma escrita ou leitura.
+        if(random.randint(0, 1)): # Se for Escrita
             file.downWrite() # Obtém acesso ao arquivo.
             
             content_to_write = get_random_string(random.randint(1, 5))# Gera o conteúdo a escrito.
-            print(f"Processo {wr} - Escrevendo: '{content_to_write}'")
+            print(f"\nProcesso {wr} - Escrevendo: '{content_to_write}'")
             file.write_line(content_to_write) # Realiza a escrita no arquivo.
             time.sleep(random.randint(1, 5))
             file.upWrite() # Libera o acesso ao arquivo.
             
-            print(f"Processo {wr} - parou de escrever.")
+            print(f"Processo {wr} - parou de escrever.\n")
         else:
             file.downRead() # Obtém acesso ao arquivo.
             
@@ -40,7 +40,7 @@ def writer_reader(wr:int):
            
             file.upRead() # Libera o acesso ao arquivo.
             
-            print(f"Processo {wr} - parou de ler.")
+            print(f"Processo {wr} - parou de ler.\n")
 
 # Processo sincronizador.
 # @param s - int | Identificador do processo.
@@ -52,13 +52,13 @@ def syncronizer(s:int, numFiles:int):
         time.sleep(random.randint(1, 3))
         file.downSync() # Obtém acesso ao arquivo.
 
-        print(f"Sincronizador {s} iniciando sincronização...")
+        print(f"\nSincronizador {s} iniciando sincronização...")
         time.sleep(random.randint(1, 3))
 
         file.sync() # Realiza a sincronização dos arquivos.
         file.upSync() # Libera o acesso ao arquivo.
 
-        print(f"Sincronizador {s} terminou a sincronização.")
+        print(f"Sincronizador {s} terminou a sincronização.\n")
 
 
 

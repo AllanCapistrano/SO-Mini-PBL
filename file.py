@@ -134,13 +134,13 @@ class File:
             chosen_file = self.__chose_file__() # Escolhe um arquivo aleatoriamente
             
             if(chosen_file['found']):
-                print(f'Lendo o conteúdo de "{chosen_file["file"]}"')
+                print(f'\nLendo o conteúdo de "{chosen_file["file"]}"')
                 
                 with open(chosen_file['file'],'r') as file:
                     content = file.readlines()
                     file.close()
                 
-                print(f"Conteúdo:")
+                print(f"\nConteúdo:")
                 print(content)
         else:
             print("Não é permitida a leitura do arquivo, é necessário uma sincronização.")
