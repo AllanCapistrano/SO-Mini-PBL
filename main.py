@@ -45,7 +45,7 @@ def writer_reader(wr:int):
 # Processo sincronizador.
 # @param s - int | Identificador do processo.
 # @param numFiles - int | Número de arquivos.
-def syncronizer(s:int, numFiles:int):
+def synchronizer(s:int, numFiles:int):
     numFiles = numFiles
     
     while True:
@@ -63,7 +63,7 @@ def syncronizer(s:int, numFiles:int):
 
 
 # Cria o processo que irá sincronizar os arquivos.
-_thread.start_new_thread(syncronizer, tuple([0,numFiles]))
+_thread.start_new_thread(synchronizer, tuple([0,numFiles]))
 
 
 # Cria os processos que podem ler ou escrever no arquivo.
